@@ -1,0 +1,380 @@
+from config import settings
+from random import random, randrange, randint, choice  # стандартная библиотека
+# from pynput.keyboard import Key, Controller # управление клавиатурой
+# import pynput # надо устанавливать через pip
+import shutil, asyncio, time  # стандартная библиотека
+# import urllib.request
+import discord  # надо устанавливать через pip
+from discord.ext import commands
+from PIL import Image, ImageDraw
+from discord.ext.commands import Bot
+from discord.utils import get
+import collections
+from kaomoji import kaomoji
+import os
+import base64
+import json
+import requests
+
+intents = discord.Intents().all()
+chann = settings['chan']
+win = 0
+piu = False
+reactics = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
+fin = False
+a = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9']]
+road_spis = []
+mass = []
+fone = Image.open('pill.png').convert('RGB')
+idraw = ImageDraw.Draw(fone)
+k = 0
+print('rig')
+client = discord.Client()
+bot = commands.Bot(command_prefix='-', intents=intents)
+
+
+def tictac(i):
+    global win, fin, a, idraw, k
+    if (((a[0][0] != a[0][1] or a[0][1] != a[0][2] or a[0][0] != a[0][2]) and (
+            a[1][0] != a[1][1] or a[1][1] != a[1][2] or a[1][0] != a[1][2]) and (
+                 a[2][0] != a[2][1] or a[2][1] != a[2][2] or a[2][0] != a[2][2])) and (
+                (a[0][0] != a[1][0] or a[1][0] != a[2][0] or a[0][0] != a[2][0]) and (
+                a[0][2] != a[1][2] or a[1][2] != a[2][2] or a[0][2] != a[2][2]) and (
+                        a[0][2] != a[1][2] or a[1][2] != a[2][2] or a[0][2] != a[2][2])) and (
+                (a[0][0] != a[1][1] or a[1][1] != a[2][2] or a[0][0] != a[2][2]) and (
+                a[0][2] != a[1][1] or a[1][1] != a[2][0] or a[0][2] != a[2][0])) and (
+                a[0][1] != a[1][1] or a[0][1] != a[2][1] or a[1][1] != a[2][1])) and k != 9:
+        if k % 2 == 0:
+            for j in range(len(a)):
+                if i + 1 in a[j]:
+                    a[j][a[j].index(i + 1)] = 'x'
+        else:
+            for j in range(len(a)):
+                if i + 1 in a[j]:
+                    a[j][a[j].index(i + 1)] = 'o'
+        k += 1
+    if a[0][0] == a[1][0] == a[2][0]:
+
+        fin = True
+    elif a[0][0] == a[0][1] == a[0][2]:
+
+        fin = True
+    elif a[0][2] == a[1][1] == a[2][0]:
+
+        fin = True
+
+    elif a[0][1] == a[1][1] == a[2][1]:
+
+        fin = True
+    elif a[0][2] == a[1][2] == a[2][2]:
+
+        fin = True
+    elif a[1][0] == a[1][1] == a[1][2]:
+
+        fin = True
+    elif a[2][1] == a[2][0] == a[2][2]:
+
+        fin = True
+    elif a[0][0] == a[1][1] == a[2][2]:
+        fin = True
+    if k % 2 == 0 and fin:
+        win = 1
+    elif fin:
+        win = 2
+
+
+# Команды~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# @bot.event
+# async def emoji_pressed(ctx):
+#    global road_spis
+#    await bot.wait_until_ready()
+#    await bot.process_commands(ctx)
+
+
+@bot.command()
+async def getchan(ctx, id):  # получение ид канала
+    global chann
+    chann = id
+    print(chann)
+
+
+@bot.command()
+async def play(ctx):  # крестики-нолики
+    global mass, contentx, contento, a
+    contentx, contento = '', ''  # игроки в крестики-нолики
+    e = discord.Embed(color=0xFFFFFF, title='choose your emblem',
+                      description=(' ' + ' '.join(a[0]) + '\n' + ' '.join(a[1]) + '\n' + ' '.join(a[2]) + '\n'))
+    read = await ctx.send(embed=e)
+    await read.add_reaction('❌')
+    await read.add_reaction('⭕')
+
+
+@bot.command()
+@commands.has_permissions(administrator=True)
+async def road(ctx):  # приветствие
+    react = bot.get_emoji(814741311747653673)
+    read = await ctx.send(f'Привет!^^\n'
+                          f'Меня зовут <@{329991614053220352}>, и я - создатель этого чудесного места.'
+                          f' Поверь, я себе не льщу, это место '
+                          f'действительно чудесно, и я буду рад предоставить тебе доказательства.\n'
+                          f'Нажми на реакцию, если ты готов окунуться в мой мир, и твой путь начнётся.'
+                          )
+    await read.add_reaction(react)
+    # await ctx.send(read.reactions)
+    # users =
+    # await channel.send('{} has won the raffle.'.format(users))
+
+
+@bot.command()
+async def fox(ctx):  # вызов рандомной картинки лисы
+    response = requests.get('https://some-random-api.ml/img/fox')  # Get-запрос
+    json_data = json.loads(response.text)  # Извлекаем JSON
+
+    embed = discord.Embed(color=0xff9900, title='Random Fox')  # Создание Embed'a
+    embed.set_image(url=json_data['link'])  # Устанавливаем картинку Embed'a
+    await ctx.send(embed=embed)  # Отправляем Embed
+
+
+# @bot.command()
+# @commands.has_permissions(administrator=True)
+# async def rer(ctx):
+#    react = [":yes:"]
+#    emoji = get(ctx.message.guild.emojis, name=react[0])
+#    await ctx.message.add_reaction(react[0])
+#    await ctx.send(str(ctx.message))
+
+
+@bot.command()
+async def hug(ctx, user: discord.Member = None):  # объятия
+    kao = kaomoji.Kaomoji()
+    try:
+        if user.mention != ctx.message.author.mention and user.mention:
+            await ctx.send(f'{ctx.message.author.mention} обнял(а) {user.mention}! {kao.random_kaomoji()}')
+        elif user.mention == ctx.message.author.mention and user.mention:
+            await ctx.send(f'У {ctx.message.author.mention} самообнимашки! {kao.random_kaomoji()}')
+    except AttributeError:
+        await ctx.send(f'{ctx.message.author.mention}, дай я тебя обниму!^^')
+
+
+@bot.command()
+async def rename(member, channel, *, new_name):  # переименование голосового канала
+    namechannel = new_name
+    numvoise = discord.utils.get(member.guild.voice_channels, id=int(channel))
+    await numvoise.edit(name=namechannel)
+
+
+# @bot.command()
+# @commands.has_permissions(administrator=True)
+# async def ot(ctx):  # разовая комманда
+#    ''' Канал для комьюнити отдыхалища
+#    '''
+#    # await ctx.message.delete()
+# text = "Канал для комьюнити отдыхалища, может быть будет меняться
+# , но этот канал создан, чтоб не терять своих, всем добра)"
+#    Welcom = discord.Embed(title="Добро пожаловат в Отдыхалище!", description=text, colour=0x6699FF)
+#    massage = await ctx.send(embed=Welcom)
+#    await massage.add_reaction('👀')
+
+@bot.command()
+async def bite(ctx, user: discord.Member = None):  # укус
+    kao = kaomoji.Kaomoji()
+    try:
+        if user.mention != ctx.message.author.mention and user.mention:
+            await ctx.send(f'{ctx.message.author.mention} укусил(а) {user.mention}! {kao.random_kaomoji()}')
+        elif user.mention == ctx.message.author.mention and user.mention:
+            await ctx.send(f'У {ctx.message.author.mention} самоокусь! {kao.random_kaomoji()}')
+    except AttributeError:
+        await ctx.send(f'{ctx.message.author.mention}, ты не можешь кусать воздух!')
+
+
+@bot.command()
+async def pat(ctx, user: discord.Member = None):  # поглаживание по голове
+    kao = kaomoji.Kaomoji()
+    try:
+        if user.mention != ctx.message.author.mention and user.mention:
+            await ctx.send(f'{ctx.message.author.mention} погладил(а) по голове {user.mention}! {kao.random_kaomoji()}')
+        elif user.mention == ctx.message.author.mention and user.mention:
+            await ctx.send(f'У {ctx.message.author.mention} самопоглаживание! {kao.random_kaomoji()}')
+    except AttributeError:
+        await ctx.send(f'{ctx.message.author.mention}, позволь погладить тебя по голове^^')
+
+
+@bot.command()
+async def goodday(ctx):  # проверка бота и просто приятная вещь
+    await ctx.send('Ты супер!')
+
+
+@bot.command()
+async def avatar(ctx, member: discord.Member = None):  # Получение аватарки пользователя
+    '''
+    Вызывает аватар
+    '''
+    user = member
+
+    embed = discord.Embed(title=f'Аватар пользователя {user}', color=user.color)
+    # embed = discord.Embed(color=0xff9900, title='Random Fox')  # Создание Embed'a
+    print(user.avatar_url)
+    embed.set_image(url=user.avatar_url)  # Устанавливаем картинку Embed'a
+    await ctx.send(embed=embed)  # Отправляем Embed
+
+
+@bot.command()
+async def kiss(ctx, user: discord.Member = None):  # Поцелуй
+    kao = kaomoji.Kaomoji()
+    try:
+        if user.mention != ctx.message.author.mention and user.mention:
+            await ctx.send(f'{ctx.message.author.mention} поцеловал(а) {user.mention}! {kao.random_kaomoji()}')
+        elif user.mention == ctx.message.author.mention and user.mention:
+            await ctx.send(f'У {ctx.message.author.mention} поцеловал(а) сам(а) себя! {kao.random_kaomoji()}')
+    except AttributeError:
+        await ctx.send(f'{ctx.message.author.mention}, ты не можешь поцеловать ничто!')
+
+
+@bot.command()
+async def con(ctx, messageId: int):  # исправление раскладки клавиатуры(Ала, переделать в свое)
+    s = ''
+    slovar = {'`': 'ё', '~': 'Ё', 'q': 'й', 'Q': 'Й',
+              'w': 'ц', 'W': 'Ц', 'e': 'у', 'E': 'У',
+              'r': 'к', 'R': 'К', 't': 'е', 'T': 'Е',
+              'y': 'н', 'Y': 'Н', 'u': 'г', 'U': 'Г',
+              'i': 'ш', 'I': 'Ш', 'o': 'щ', 'O': 'Щ',
+              'p': 'з', 'P': 'З', '[': 'х', '{': 'Х',
+              ']': 'ъ', '}': 'Ъ', 'a': 'ф', 'A': 'Ф',
+              's': 'ы', 'S': 'Ы', 'd': 'в', 'D': 'В',
+              'f': 'а', 'F': 'А', 'g': 'п', 'G': 'П',
+              'h': 'р', 'H': 'Р', 'j': 'о', 'J': 'О',
+              'k': 'л', 'K': 'Л', 'l': 'д', 'L': 'Д',
+              ';': 'ж', ':': 'Ж', "'": 'э', '"': 'Э',
+              "z": 'я', 'Z': 'Я', 'x': 'ч', 'X': 'Ч',
+              'c': 'с', 'C': 'С', 'v': 'м', 'V': 'М',
+              'b': 'и', 'B': 'И', 'n': 'т', 'N': 'Т',
+              'm': 'ь', 'M': 'Ь', ',': 'б', '<': 'Б',
+              '.': 'ю', '>': 'Ю', '/': '.', '?': ',',
+              ' ': ' '
+              }
+
+    message = await ctx.guild.get_channel(ctx.channel.id).fetch_message(messageId)
+    for i in message.clean_content:
+        if i not in slovar:
+            s += i
+        else:
+            s += slovar[i]
+
+    author = "Автор сообщения: " + str(message.author) + "\n"
+    clean_content = "написал: \n" + str(message.clean_content) + "\n\n"
+    system_content = "хотел написать: \n" + str(s) + "\n\n"
+    created_at = "Созданно: " + str(message.created_at) + "\n"
+    symbol = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'B', 'C', 'D', 'F']
+    a1 = choice(symbol)
+    a2 = choice(symbol)
+    b1 = choice(symbol)
+    b2 = choice(symbol)
+    c1 = choice(symbol)
+    c2 = choice(symbol)
+    expert = '0x' + a1 + a2 + b1 + b2 + c1 + c2
+    cvet = 'Цвет: ' + expert + "\n"
+    mess = discord.Embed(title="Пунто свичер", description=clean_content + system_content + created_at + cvet,
+                         colour=int(expert, 16))
+    mess.set_footer(text=f'Созданно: {message.author}', icon_url=str(message.author.avatar_url))
+    await ctx.send(embed=mess)
+
+
+# Ивенты~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+@bot.event
+async def on_message(message):  # еще одна временная приятная вещь
+    await bot.wait_until_ready()
+    await bot.process_commands(message)
+    author = message.author
+    if message.content == 'Привет, Риг':
+        await message.channel.send('Доброе утро, {}!'.format(author))
+
+
+@bot.event
+async def on_raw_reaction_add(reaction):  # нажатие на реакцию
+    global contentx, contento, piu, reactics
+    guild = discord.utils.get(bot.guilds, id=reaction.guild_id)
+    message = await guild.get_channel(reaction.channel_id).fetch_message(int(reaction.message_id))
+    users = bot.get_user(id=reaction.user_id)
+    if str(reaction.emoji) in '❌':
+        if not users.bot and str(users) not in contento:
+            for reaction in message.reactions:
+                if str(reaction) in '❌':
+                    contentx = '❌: ' + str(users) + '\n'
+                    await reaction.remove(users)
+                    await reaction.remove(message.author)
+        elif not users.bot and str(users) in contento:
+            for reaction in message.reactions:
+                if str(reaction) in '❌':
+                    await reaction.remove(users)
+    elif str(reaction.emoji) in '⭕':
+        if not users.bot and str(users) not in contentx:
+            for reaction in message.reactions:
+                if str(reaction) in '⭕':
+                    contento = '⭕: ' + str(users) + '\n'
+                    await reaction.remove(users)
+                    await reaction.remove(message.author)
+                    piu = False
+        elif not users.bot and str(users) in contentx:
+            for reaction in message.reactions:
+                if str(reaction) in '⭕':
+                    await reaction.remove(users)
+    if contentx != '' and contento != '' and not piu:
+        e = discord.Embed(color=0xFFFFFF, title='choose your emblem',
+                          description=(' ' + ' '.join(a[0]) + '\n' + ' '.join(a[1]) + '\n' + ' '.join(a[2]) + '\n'))
+        await message.edit(embed=e)
+        piu = True
+        for reaction in reactics:
+            await message.add_reaction(reaction)
+
+    if str(reaction) in '1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣8️⃣9️⃣' and not users.bot:
+        print(str(reaction))
+        mine = int(str(reaction)[0])
+        tictac(mine)
+        print(mine)
+        print(a)
+        reactics.remove(str(mine) + '️⃣')
+        e = discord.Embed(color=0xFFFFFF, title='choose your emblem',
+                          description=(' ' + ' '.join(a[0]) + '\n' + ' '.join(a[1]) + '\n' + ' '.join(a[2]) + '\n'))
+        await message.delete()
+        channel = guild.get_channel(reaction.channel_id)
+        read = await channel.send(embed=e)
+        for reaction in reactics:
+            await read.add_reaction(reaction)
+        if win == 1:
+            await channel.send('player 2')
+        elif win == 2:
+            await channel.send('player 1')
+        # while win != 0:
+        #     tictac()
+
+
+@bot.event
+async def on_member_join(ctx):  # выдача роли зашедшему участнику
+    role = discord.utils.get(ctx.guild.roles, name='Потеряшка')
+    await ctx.add_roles(role)
+
+
+@bot.event
+async def on_member_remove(member):  # прощание с вышедшим участником сервера
+    global chann  # id канала, в который отправляем сообщение
+    my_channel = discord.utils.get(bot.get_all_channels(), id=chann)
+    await my_channel.send(f'{member} покинул нас. Пожелаем ему удачи!')
+    # await my_channel.send(f'{member}, {member.id} вышел с сервера.')
+
+
+# async def on_raw_reaction_add(self, payload):
+#     emoji = payload.emoji  # реакция пользователя
+#     channel = self.get_channel(payload.channel_id)  # Получаем канал
+#     message = await channel.fetch_message(payload.message_id)  # Получаем сообщение
+#     author = message.author  # Получаем автора
+#     print(emoji)
+#     print(channel)
+#     print(message)
+#     print(author)
+
+
+# def on_raw_reaction_remove(self, payload):
+#     emoji = payload.emoji  # реакция пользователя
+
+
+bot.run(settings['token'])  # Обращаемся к словарю settings с ключом token, для получения токена
