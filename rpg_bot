@@ -1,0 +1,166 @@
+from config import setnothing
+from PIL import Image, ImageDraw
+from random import random, randrange, randint, choice  # стандартная библиотека
+# from pynput.keyboard import Key, Controller # управление клавиатурой
+# import pynput # надо устанавливать через pip
+import shutil, asyncio, time  # стандартная библиотека
+# import urllib.request
+import discord  # надо устанавливать через pip
+from discord.ext import commands
+from discord.ext.commands import Bot
+from discord.utils import get
+import collections
+from kaomoji import kaomoji
+import os
+import json
+import requests, sqlite3
+
+intents = discord.Intents().all()
+delete_flag = False
+start_flag = False
+road_spis = []
+weap_react = ['', '', '']
+print('dreg')
+client = discord.Client()
+bot = commands.Bot(command_prefix=setnothing['prefix'])
+red = 0xFFFFFF
+start_weapons = {'Assassin': {'The bloody blade': [13, 25, 0, 836006951997407242, 'causes bleeding on critical impact'],
+                              'Stealth dagger': [15, 23, 0, 836118624979910666,
+                                                 '2 times more damage if the carrier is not seen by enemies'],
+                              'Knife with brass knuckles': [14, 31, 0, 836118122750148628,
+                                                            'on a critical attack, it deals a second blow with brass '
+                                                            'knuckles, the damage of which is equal to half of the '
+                                                            'damage of the blade']}, 'Hunter': []}
+
+
+@bot.command()
+async def stats(ctx):
+    author = ctx.message.author
+    con = sqlite3.connect("players.sqlite")
+    cur = con.cursor()
+
+    resultt = cur.execute(f"""SELECT * FROM players WHERE user = {author.id}""")
+
+    if resultt.fetchone() is not None:
+        result = cur.execute(f"""SELECT * FROM players WHERE user = {author.id}""").fetchall()[0]
+        e = discord.Embed(color=red, title=f'-═══════ι▬▬RPG▬▬ι═══════ﺤ\n{str(author)}',
+                          description=f'max hp = {result[1]}{bot.get_emoji(836221317954273281)}\n'
+                          f'hp = {result[2]}{bot.get_emoji(836221317954273281)}\n'
+                          f'experience = {result[3]}{bot.get_emoji(836228817600380989)}\n'
+                          f'weapon = {result[4]}{bot.get_emoji(result[8])}\n'
+                                      f'armor = {result[5]}\n'
+                          f'class = {result[6]}{bot.get_emoji(836232650149986364)}\n')
+        await ctx.send(embed=e)
+    else:
+        e = discord.Embed(color=red, title=f'-═══════ι▬▬RPG▬▬ι═══════ﺤ\n{str(author)}',
+                          description='У вас ещё нет персонажа. Напишите $$start для его создания.')
+        await ctx.send(embed=e)
+
+
+@bot.command()
+async def start(ctx):
+    '''
+    Создать/удалить персонажа.
+    '''
+    global start_flag, delete_flag, klass
+    author = ctx.message.author
+    con = sqlite3.connect("players.sqlite")
+    cur = con.cursor()
+    result = cur.execute(f"""SELECT * FROM players WHERE user = {author.id}""")
+
+    if result.fetchone() is None:
+        start_flag = True
+        react = [bot.get_emoji(836232650149986364), bot.get_emoji(836277206275457024),
+                 bot.get_emoji(829500421680005160), bot.get_emoji(829503863928913950)]
+        e = discord.Embed(color=0xFFFFFF, title='Выберите ваш класс:',
+                          description=(f'Ассасин{bot.get_emoji(836232650149986364)}'
+                                       f'\nОхотник{bot.get_emoji(836277206275457024)}\n'
+                                       f'Воин{bot.get_emoji(829500421680005160)}\n'
+                                       f'Маг{bot.get_emoji(829503863928913950)}'))
+        read = await ctx.send(embed=e)
+        for reactt in react:
+            await read.add_reaction(reactt)
+
+    else:
+        read = await ctx.send('Вы уже в системе. Хотите начать все сначала?')
+        await read.add_reaction('✅')
+        delete_flag = True
+        await read.add_reaction('❌')
+    con.close()
+
+
+@bot.event
+async def on_raw_reaction_add(reaction):
+    global start_flag, delete_flag, klass, weap_react, weapon
+    users = bot.get_user(id=reaction.user_id)
+    guild = discord.utils.get(bot.guilds, id=reaction.guild_id)
+    message = await guild.get_channel(reaction.channel_id).fetch_message(int(reaction.message_id))
+    if reaction.emoji.name == '✅' and delete_flag and not users.bot:
+        author = bot.get_user(id=reaction.user_id)
+        con = sqlite3.connect("players.sqlite")
+        cur = con.cursor()
+        cur.execute(f"""DELETE FROM players WHERE user = {author.id}""")
+        con.commit()
+        con.close()
+        delete_flag = False
+        for reac in message.reactions:
+            await reac.remove(users)
+            await reac.remove(message.author)
+        e = discord.Embed(color=0xFFF000, title='Done')
+        await message.edit(embed=e)
+    elif start_flag and (reaction.emoji.id == weap_react[0] or reaction.emoji.id == weap_react[1] or
+                         reaction.emoji.id == weap_react[2]) and not users.bot:
+        weapon = ''
+        for i in list(start_weapons['Assassin'].keys()):
+            if start_weapons['Assassin'][i][3] == reaction.emoji.id:
+                weapon = i
+        author = bot.get_user(id=reaction.user_id)
+        con = sqlite3.connect("players.sqlite")
+        cur = con.cursor()
+        con.commit()
+        cur.execute(
+            f"""INSERT INTO players VALUES ({author.id}, {100}, {100}, {10}, '{weapon}', 'None', '{klass}', 'lore', 
+{reaction.emoji.id}, 0)""")
+        con.commit()
+        con.close()
+        for reac in message.reactions:
+            await reac.remove(users)
+            await reac.remove(message.author)
+        e = discord.Embed(color=0xFFFFFF, title='Ваш персонаж создан', description='Пропишите $$stats для просмотра '
+                                                                                   'профиля')
+        await message.edit(embed=e)
+        weapon = ''
+        start_flag = False
+    elif reaction.emoji.name == '❌' and delete_flag and not users.bot:
+        delete_flag = False
+    elif start_flag and reaction.emoji.name in str(bot.get_emoji(836232650149986364)) and not users.bot:
+        print(reaction.emoji.name, weap_react)
+        klass = 'Assassin'
+        embd = ''
+        emoj = []
+        for emb in start_weapons['Assassin'].keys():
+            embd += f"{bot.get_emoji(start_weapons['Assassin'][emb][3])} {emb}\nУрон  " \
+                f"{start_weapons['Assassin'][emb][0]}{bot.get_emoji(836125665782661130)}\n Шанс крита" \
+                f" {start_weapons['Assassin'][emb][1]}{bot.get_emoji(836112201278160899)}\nЦена " \
+                f"{start_weapons['Assassin'][emb][2]}{bot.get_emoji(836129941099642920)}\n" \
+                f" Особый эффект {start_weapons['Assassin'][emb][4]}\n"
+            emoj.append(bot.get_emoji(start_weapons['Assassin'][emb][3]))
+            weap_react.insert(0, start_weapons['Assassin'][emb][3])
+        e = discord.Embed(color=0xFFFFFF, title='Выберите ваше оружие:',
+                          description=embd)
+        for reac in message.reactions:
+            await reac.remove(users)
+            await reac.remove(message.author)
+        await message.edit(embed=e)
+        for em in emoj:
+            await message.add_reaction(em)
+
+    elif start_flag and reaction.emoji.name == bot.get_emoji(829504294243139664):
+        klass = 'Hunter'
+    elif start_flag and reaction.emoji.name == bot.get_emoji(829504294243139664):
+        klass = 'Warrior'
+    elif start_flag and reaction.emoji.name == bot.get_emoji(829504294243139664):
+        klass = 'Mage'
+
+
+bot.run(setnothing['token'])  # Обращаемся к словарю settings с ключом token, для получения токена
