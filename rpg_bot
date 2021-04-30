@@ -25,6 +25,7 @@ weap_react = ['', '', '']
 klass = ''
 klass_id = 0
 print('dreg')
+print('pref = $$')
 client = discord.Client()
 bot = commands.Bot(command_prefix=setnothing['prefix'])
 red = 0xFFFFFF
@@ -249,6 +250,7 @@ async def locate(ctx):
         e = discord.Embed(color=red, title=f'-═══════ι▬▬RPG▬▬ι═══════ﺤ\n{str(author)}',
                           description='Вы в бою.')
         await ctx.send(embed=e)
+        is_fight = True
         return
     result = cur.execute(f"""SELECT * FROM locates""").fetchall()
     locat = ''
