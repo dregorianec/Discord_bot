@@ -9,5 +9,5 @@ setnothing = {
     'token': 'your token',
     'bot': 'dregorianec',
     'id': bot_id,
-    'prefix': '!',
+    'prefix': '$$',
 }
