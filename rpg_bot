@@ -185,6 +185,31 @@ async def fight(ctx):
 
 
 @bot.command()
+async def weapon(ctx):
+    '''
+    Статистика вашего оружия
+    '''
+    author = ctx.message.author
+    con = sqlite3.connect("players.sqlite")
+    cur = con.cursor()
+    result = cur.execute(f"""SELECT * FROM players WHERE user = {author.id}""")
+    if result.fetchone() is None:
+        e = discord.Embed(color=red, title=f'-═══════ι▬▬RPG▬▬ι═══════ﺤ\n{str(author)}',
+                          description='У вас ещё нет персонажа. Напишите $$start для его создания.')
+        await ctx.send(embed=e)
+        return
+    result = cur.execute(f"""SELECT * FROM players WHERE user = {author.id}""").fetchall()[0]
+    weapn = cur.execute(f"""SELECT * FROM weapons WHERE weapon = '{result[4]}'""").fetchall()[0]
+    e = discord.Embed(color=red, title=f'-═══════ι▬▬RPG▬▬ι═══════ﺤ\n{str(author)}',
+                      description=f'weapon = {result[4]} {bot.get_emoji(result[8])}\n'
+                      f'damage = {weapn[1]}{bot.get_emoji(836125665782661130)}\n'
+                      f'crit chance = {weapn[2]}{bot.get_emoji(836112201278160899)}\n'
+                      f'price = {weapn[3]}{bot.get_emoji(836129941099642920)}\n'
+                      f'special = {weapn[5]}\n')
+    await ctx.send(embed=e)
+
+
+@bot.command()
 async def leave(ctx):
     '''
     Покинуть бой
