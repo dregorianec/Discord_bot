@@ -1,0 +1,13 @@
+settings = {
+    'token': 'your token',
+    'bot': 'Ригель',
+    'id': bot_id,
+    'prefix': '!',
+    'chan': 825516616120008727
+}
+setnothing = {
+    'token': 'your token',
+    'bot': 'dregorianec',
+    'id': bot_id,
+    'prefix': '!',
+}
