@@ -16,13 +16,14 @@ import base64
 import json
 import requests
 
+# переменные~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 intents = discord.Intents().all()
 chann = settings['chan']
 win = 0
 piu = False
 reactics = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
 fin = False
-a = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9']]
+# a = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9']]
 road_spis = []
 mass = []
 fone = Image.open('pill.png').convert('RGB')
@@ -33,54 +34,54 @@ client = discord.Client()
 bot = commands.Bot(command_prefix='-', intents=intents)
 
 
-def tictac(i):
-    global win, fin, a, idraw, k
-    if (((a[0][0] != a[0][1] or a[0][1] != a[0][2] or a[0][0] != a[0][2]) and (
-            a[1][0] != a[1][1] or a[1][1] != a[1][2] or a[1][0] != a[1][2]) and (
-                 a[2][0] != a[2][1] or a[2][1] != a[2][2] or a[2][0] != a[2][2])) and (
-                (a[0][0] != a[1][0] or a[1][0] != a[2][0] or a[0][0] != a[2][0]) and (
-                a[0][2] != a[1][2] or a[1][2] != a[2][2] or a[0][2] != a[2][2]) and (
-                        a[0][2] != a[1][2] or a[1][2] != a[2][2] or a[0][2] != a[2][2])) and (
-                (a[0][0] != a[1][1] or a[1][1] != a[2][2] or a[0][0] != a[2][2]) and (
-                a[0][2] != a[1][1] or a[1][1] != a[2][0] or a[0][2] != a[2][0])) and (
-                a[0][1] != a[1][1] or a[0][1] != a[2][1] or a[1][1] != a[2][1])) and k != 9:
-        if k % 2 == 0:
-            for j in range(len(a)):
-                if i + 1 in a[j]:
-                    a[j][a[j].index(i + 1)] = 'x'
-        else:
-            for j in range(len(a)):
-                if i + 1 in a[j]:
-                    a[j][a[j].index(i + 1)] = 'o'
-        k += 1
-    if a[0][0] == a[1][0] == a[2][0]:
-
-        fin = True
-    elif a[0][0] == a[0][1] == a[0][2]:
-
-        fin = True
-    elif a[0][2] == a[1][1] == a[2][0]:
-
-        fin = True
-
-    elif a[0][1] == a[1][1] == a[2][1]:
-
-        fin = True
-    elif a[0][2] == a[1][2] == a[2][2]:
-
-        fin = True
-    elif a[1][0] == a[1][1] == a[1][2]:
-
-        fin = True
-    elif a[2][1] == a[2][0] == a[2][2]:
-
-        fin = True
-    elif a[0][0] == a[1][1] == a[2][2]:
-        fin = True
-    if k % 2 == 0 and fin:
-        win = 1
-    elif fin:
-        win = 2
+# def tictac(i):
+#     global win, fin, a, idraw, k
+#     if (((a[0][0] != a[0][1] or a[0][1] != a[0][2] or a[0][0] != a[0][2]) and (
+#             a[1][0] != a[1][1] or a[1][1] != a[1][2] or a[1][0] != a[1][2]) and (
+#                  a[2][0] != a[2][1] or a[2][1] != a[2][2] or a[2][0] != a[2][2])) and (
+#                 (a[0][0] != a[1][0] or a[1][0] != a[2][0] or a[0][0] != a[2][0]) and (
+#                 a[0][2] != a[1][2] or a[1][2] != a[2][2] or a[0][2] != a[2][2]) and (
+#                         a[0][2] != a[1][2] or a[1][2] != a[2][2] or a[0][2] != a[2][2])) and (
+#                 (a[0][0] != a[1][1] or a[1][1] != a[2][2] or a[0][0] != a[2][2]) and (
+#                 a[0][2] != a[1][1] or a[1][1] != a[2][0] or a[0][2] != a[2][0])) and (
+#                 a[0][1] != a[1][1] or a[0][1] != a[2][1] or a[1][1] != a[2][1])) and k != 9:
+#         if k % 2 == 0:
+#             for j in range(len(a)):
+#                 if i + 1 in a[j]:
+#                     a[j][a[j].index(i + 1)] = 'x'
+#         else:
+#             for j in range(len(a)):
+#                 if i + 1 in a[j]:
+#                     a[j][a[j].index(i + 1)] = 'o'
+#         k += 1
+#     if a[0][0] == a[1][0] == a[2][0]:
+#
+#         fin = True
+#     elif a[0][0] == a[0][1] == a[0][2]:
+#
+#         fin = True
+#     elif a[0][2] == a[1][1] == a[2][0]:
+#
+#         fin = True
+#
+#     elif a[0][1] == a[1][1] == a[2][1]:
+#
+#         fin = True
+#     elif a[0][2] == a[1][2] == a[2][2]:
+#
+#         fin = True
+#     elif a[1][0] == a[1][1] == a[1][2]:
+#
+#         fin = True
+#     elif a[2][1] == a[2][0] == a[2][2]:
+#
+#         fin = True
+#     elif a[0][0] == a[1][1] == a[2][2]:
+#         fin = True
+#     if k % 2 == 0 and fin:
+#         win = 1
+#     elif fin:
+#         win = 2
 
 
 # Команды~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -98,15 +99,15 @@ async def getchan(ctx, id):  # получение ид канала
     print(chann)
 
 
-@bot.command()
-async def play(ctx):  # крестики-нолики
-    global mass, contentx, contento, a
-    contentx, contento = '', ''  # игроки в крестики-нолики
-    e = discord.Embed(color=0xFFFFFF, title='choose your emblem',
-                      description=(' ' + ' '.join(a[0]) + '\n' + ' '.join(a[1]) + '\n' + ' '.join(a[2]) + '\n'))
-    read = await ctx.send(embed=e)
-    await read.add_reaction('❌')
-    await read.add_reaction('⭕')
+# @bot.command()
+# async def play(ctx):  # крестики-нолики
+#     global mass, contentx, contento, a
+#     contentx, contento = '', ''  # игроки в крестики-нолики
+#     e = discord.Embed(color=0xFFFFFF, title='choose your emblem',
+#                       description=(' ' + ' '.join(a[0]) + '\n' + ' '.join(a[1]) + '\n' + ' '.join(a[2]) + '\n'))
+#     read = await ctx.send(embed=e)
+#     await read.add_reaction('❌')
+#     await read.add_reaction('⭕')
 
 
 @bot.command()
@@ -289,63 +290,63 @@ async def on_message(message):  # еще одна временная прият�
         await message.channel.send('Доброе утро, {}!'.format(author))
 
 
-@bot.event
-async def on_raw_reaction_add(reaction):  # нажатие на реакцию
-    global contentx, contento, piu, reactics
-    guild = discord.utils.get(bot.guilds, id=reaction.guild_id)
-    message = await guild.get_channel(reaction.channel_id).fetch_message(int(reaction.message_id))
-    users = bot.get_user(id=reaction.user_id)
-    if str(reaction.emoji) in '❌':
-        if not users.bot and str(users) not in contento:
-            for reaction in message.reactions:
-                if str(reaction) in '❌':
-                    contentx = '❌: ' + str(users) + '\n'
-                    await reaction.remove(users)
-                    await reaction.remove(message.author)
-        elif not users.bot and str(users) in contento:
-            for reaction in message.reactions:
-                if str(reaction) in '❌':
-                    await reaction.remove(users)
-    elif str(reaction.emoji) in '⭕':
-        if not users.bot and str(users) not in contentx:
-            for reaction in message.reactions:
-                if str(reaction) in '⭕':
-                    contento = '⭕: ' + str(users) + '\n'
-                    await reaction.remove(users)
-                    await reaction.remove(message.author)
-                    piu = False
-        elif not users.bot and str(users) in contentx:
-            for reaction in message.reactions:
-                if str(reaction) in '⭕':
-                    await reaction.remove(users)
-    if contentx != '' and contento != '' and not piu:
-        e = discord.Embed(color=0xFFFFFF, title='choose your emblem',
-                          description=(' ' + ' '.join(a[0]) + '\n' + ' '.join(a[1]) + '\n' + ' '.join(a[2]) + '\n'))
-        await message.edit(embed=e)
-        piu = True
-        for reaction in reactics:
-            await message.add_reaction(reaction)
-
-    if str(reaction) in '1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣8️⃣9️⃣' and not users.bot:
-        print(str(reaction))
-        mine = int(str(reaction)[0])
-        tictac(mine)
-        print(mine)
-        print(a)
-        reactics.remove(str(mine) + '️⃣')
-        e = discord.Embed(color=0xFFFFFF, title='choose your emblem',
-                          description=(' ' + ' '.join(a[0]) + '\n' + ' '.join(a[1]) + '\n' + ' '.join(a[2]) + '\n'))
-        await message.delete()
-        channel = guild.get_channel(reaction.channel_id)
-        read = await channel.send(embed=e)
-        for reaction in reactics:
-            await read.add_reaction(reaction)
-        if win == 1:
-            await channel.send('player 2')
-        elif win == 2:
-            await channel.send('player 1')
-        # while win != 0:
-        #     tictac()
+# @bot.event
+# async def on_raw_reaction_add(reaction):  # нажатие на реакцию
+#     global contentx, contento, piu, reactics
+#     guild = discord.utils.get(bot.guilds, id=reaction.guild_id)
+#     message = await guild.get_channel(reaction.channel_id).fetch_message(int(reaction.message_id))
+#     users = bot.get_user(id=reaction.user_id)
+#     if str(reaction.emoji) in '❌':
+#         if not users.bot and str(users) not in contento:
+#             for reaction in message.reactions:
+#                 if str(reaction) in '❌':
+#                     contentx = '❌: ' + str(users) + '\n'
+#                     await reaction.remove(users)
+#                     await reaction.remove(message.author)
+#         elif not users.bot and str(users) in contento:
+#             for reaction in message.reactions:
+#                 if str(reaction) in '❌':
+#                     await reaction.remove(users)
+#     elif str(reaction.emoji) in '⭕':
+#         if not users.bot and str(users) not in contentx:
+#             for reaction in message.reactions:
+#                 if str(reaction) in '⭕':
+#                     contento = '⭕: ' + str(users) + '\n'
+#                     await reaction.remove(users)
+#                     await reaction.remove(message.author)
+#                     piu = False
+#         elif not users.bot and str(users) in contentx:
+#             for reaction in message.reactions:
+#                 if str(reaction) in '⭕':
+#                     await reaction.remove(users)
+#     if contentx != '' and contento != '' and not piu:
+#         e = discord.Embed(color=0xFFFFFF, title='choose your emblem',
+#                           description=(' ' + ' '.join(a[0]) + '\n' + ' '.join(a[1]) + '\n' + ' '.join(a[2]) + '\n'))
+#         await message.edit(embed=e)
+#         piu = True
+#         for reaction in reactics:
+#             await message.add_reaction(reaction)
+#
+#     if str(reaction) in '1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣8️⃣9️⃣' and not users.bot:
+#         print(str(reaction))
+#         mine = int(str(reaction)[0])
+#         tictac(mine)
+#         print(mine)
+#         print(a)
+#         reactics.remove(str(mine) + '️⃣')
+#         e = discord.Embed(color=0xFFFFFF, title='choose your emblem',
+#                           description=(' ' + ' '.join(a[0]) + '\n' + ' '.join(a[1]) + '\n' + ' '.join(a[2]) + '\n'))
+#         await message.delete()
+#         channel = guild.get_channel(reaction.channel_id)
+#         read = await channel.send(embed=e)
+#         for reaction in reactics:
+#             await read.add_reaction(reaction)
+#         if win == 1:
+#             await channel.send('player 2')
+#         elif win == 2:
+#             await channel.send('player 1')
+#         # while win != 0:
+#         #     tictac()
 
 
 @bot.event
