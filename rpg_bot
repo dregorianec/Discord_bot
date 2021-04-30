@@ -179,8 +179,7 @@ async def fight(ctx):
     cur.execute(
         f"""INSERT INTO fights VALUES ({author.id}, '{monster}', {hp}, {damage}, {characteristics[4]}, {level})""")
     con.commit()
-    await ctx.send(file=discord.File(f'monsters/{characteristics[6]}'))
-    read = await ctx.send(embed=e)
+    read = await ctx.send(file=discord.File(f'monsters/{characteristics[6]}'), embed=e)
     await read.add_reaction(bot.get_emoji(result[8]))
     await read.add_reaction(bot.get_emoji(836221317954273281))
 
